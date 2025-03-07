@@ -1,17 +1,79 @@
 
+# name: Build and Deploy
+
+# on:
+#   push:
+#     branches:
+#       - main
+# permissions:
+#   contents: write  # ✅ Allows pushing changes to the repo      
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v2
+
+#       - name: Set up Docker Buildx
+#         uses: docker/setup-buildx-action@v1
+
+#       - name: Log in to Docker Hub
+#         uses: docker/login-action@v1
+#         with:
+#           username: chandan.cloudops@gmail.com
+#           password: D7204181C@#123
+
+#       # - name: Build and push Docker images
+#       #   run: |
+#       #     DOCKER_HUB=cloudops96
+#       #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#       #     for service in $SERVICES; do
+#       #       if [ "$service" = "cartservice" ]; then
+#       #         docker build -t $DOCKER_HUB/private:$service ./src/$service/src
+#       #       else
+#       #         docker build -t $DOCKER_HUB/private:$service ./src/$service
+#       #       fi
+#       #       docker push $DOCKER_HUB/private:$service
+#       #     done
+
+#       - name: Update Kubernetes manifests
+#         run: |
+#           DOCKER_HUB=cloudops96
+#           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#           for service in $SERVICES; do
+#             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
+#           done
+#       - name: Commit and push changes to GitHub
+#         env:
+#           PAT_TOKEN: ${{ secrets.MY_PAT }}  # ✅ Use Personal Access Token (PAT)
+#         run: |
+#           git config --global user.name "GitHub Actions"
+#           git config --global user.email "actions@github.com"
+#           git add kubernetes-manifests/
+#           git commit -m "Update Kubernetes manifests with new image tags [skip ci]" || echo "No changes to commit"
+#           git push https://x-access-token:${PAT_TOKEN}@github.com/chandan-cloudops/E-commerce-EKS-Terraform.git main
+#       # - name: Deploy to Kubernetes
+#       #   run: |
+#       #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
+#       #     export KUBECONFIG=kubeconfig.yaml
+#       #     kubectl apply -f kubernetes-manifests/
+
+
 name: Build and Deploy
 
 on:
   push:
     branches:
       - main
+
 permissions:
-  contents: write  # ✅ Allows pushing changes to the repo      
+  contents: write  # ✅ Allows pushing changes to the repo
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,18 +87,27 @@ jobs:
           username: chandan.cloudops@gmail.com
           password: D7204181C@#123
 
-      # - name: Build and push Docker images
-      #   run: |
-      #     DOCKER_HUB=cloudops96
-      #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-      #     for service in $SERVICES; do
-      #       if [ "$service" = "cartservice" ]; then
-      #         docker build -t $DOCKER_HUB/private:$service ./src/$service/src
-      #       else
-      #         docker build -t $DOCKER_HUB/private:$service ./src/$service
-      #       fi
-      #       docker push $DOCKER_HUB/private:$service
-      #     done
+      - name: Build and push Docker images
+        run: |
+          DOCKER_HUB=cloudops96
+          SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+          for service in $SERVICES; do
+            if [ "$service" = "cartservice" ]; then
+              docker build -t $DOCKER_HUB/private:$service ./src/$service/src
+            else
+              docker build -t $DOCKER_HUB/private:$service ./src/$service
+            fi
+            docker push $DOCKER_HUB/private:$service
+          done
+
+  update_manifests:
+    runs-on: ubuntu-latest
+    needs: build  # ✅ Runs after the build job
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false  # ✅ Prevents GitHub Actions from using its own credentials
 
       - name: Update Kubernetes manifests
         run: |
@@ -45,6 +116,7 @@ jobs:
           for service in $SERVICES; do
             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
           done
+
       - name: Commit and push changes to GitHub
         env:
           PAT_TOKEN: ${{ secrets.MY_PAT }}  # ✅ Use Personal Access Token (PAT)
@@ -54,8 +126,16 @@ jobs:
           git add kubernetes-manifests/
           git commit -m "Update Kubernetes manifests with new image tags [skip ci]" || echo "No changes to commit"
           git push https://x-access-token:${PAT_TOKEN}@github.com/chandan-cloudops/E-commerce-EKS-Terraform.git main
-      # - name: Deploy to Kubernetes
-      #   run: |
-      #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
-      #     export KUBECONFIG=kubeconfig.yaml
-      #     kubectl apply -f kubernetes-manifests/
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   needs: update_manifests  # ✅ Runs after the manifest update job
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+
+  #     # - name: Deploy to Kubernetes
+  #     #   run: |
+  #     #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
+  #     #     export KUBECONFIG=kubeconfig.yaml
+  #     #     kubectl apply -f kubernetes-manifests/
