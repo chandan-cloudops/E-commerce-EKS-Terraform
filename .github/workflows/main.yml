@@ -90,7 +90,15 @@ jobs:
           for service in $SERVICES; do
             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
           done
-
+      - name: Commit and push changes to GitHub
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add kubernetes-manifests/
+          git commit -m "Update Kubernetes manifests with new image tags [skip ci]"
+          git push origin main
+        env:
+          PAT_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
       # - name: Deploy to Kubernetes
       #   run: |
       #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
