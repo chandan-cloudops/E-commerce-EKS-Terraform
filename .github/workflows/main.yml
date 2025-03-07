@@ -51,7 +51,7 @@ jobs:
           git commit -m "Update Kubernetes manifests with new image tags [skip ci]"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.MY_PAT_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.MY_PAT }}
       # - name: Deploy to Kubernetes
       #   run: |
       #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
