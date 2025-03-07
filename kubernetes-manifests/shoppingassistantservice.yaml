@@ -29,7 +29,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/shoppingassistantservice:latest  # Image from ACR
+        image: cloudops96/private:shoppingassistantservice
         ports:
         - containerPort: 8080
         env:

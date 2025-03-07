@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/cartservice:latest  # Update to ACR image
+        image: cloudops96/private:cartservice
         ports:
         - containerPort: 7070
         env:
@@ -111,7 +111,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: redis:alpine
+        image: cloudops96/private:cartservice
         ports:
         - containerPort: 6379
         readinessProbe:

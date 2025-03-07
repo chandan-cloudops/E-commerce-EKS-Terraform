@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/recommendationservice:latest  # ACR image path
+        image: cloudops96/private:recommendationservice
         ports:
         - containerPort: 8080
         readinessProbe:

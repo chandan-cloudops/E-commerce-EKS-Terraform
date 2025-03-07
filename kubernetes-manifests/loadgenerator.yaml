@@ -43,7 +43,7 @@ spec:
       - name: acr-auth  # ACR authentication secret
       initContainers:
       - name: frontend-check
-        image: busybox:latest
+        image: cloudops96/private:loadgenerator
         command:
         - /bin/sh
         - -c
@@ -74,7 +74,7 @@ spec:
           value: "frontend:80"
       containers:
       - name: main
-        image: chandancloudops96.azurecr.io/loadgenerator:latest  # Update to your ACR
+        image: cloudops96/private:loadgenerator
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

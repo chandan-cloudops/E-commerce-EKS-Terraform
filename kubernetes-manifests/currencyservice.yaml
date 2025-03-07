@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/currencyservice:latest  # ACR image path
+        image: cloudops96/private:currencyservice
         ports:
         - name: grpc
           containerPort: 7000

@@ -43,7 +43,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/adservice:latest  # Image from ACR
+        image: cloudops96/private:adservice
         ports:
         - containerPort: 9555
         env:
