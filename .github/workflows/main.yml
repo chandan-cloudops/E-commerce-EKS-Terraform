@@ -27,8 +27,8 @@ jobs:
           DOCKER_HUB=cloudops96
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
           for service in $SERVICES; do
-            docker build -t $DOCKER_HUB/public:$service ./src/$service
-            docker push $DOCKER_HUB/public:$service
+            docker build -t $DOCKER_HUB/private:$service ./src/$service
+            docker push $DOCKER_HUB/private:$service
           done
 
       - name: Update Kubernetes manifests
