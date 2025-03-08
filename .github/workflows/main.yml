@@ -46,19 +46,25 @@ jobs:
         uses: actions/checkout@v2
         with:
           persist-credentials: false  # ✅ Prevents GitHub Actions from using its own credentials
-
-      - name: Remove imagePullSecrets from Kubernetes manifests
+      - name: Fix Kubernetes manifests
         run: |
+          DOCKER_HUB=cloudops96
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
             FILE="kubernetes-manifests/${service}.yaml"
       
             if [ -f "$FILE" ]; then
-              echo "🗑 Removing imagePullSecrets from $FILE..."
+              echo "🔄 Fixing $FILE..."
       
-              # Remove all occurrences of imagePullSecrets and its child elements
+              # Remove any existing imagePullSecrets occurrences
               sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
+      
+              # Ensure imagePullSecrets is added correctly under 'spec'
+              sed -i '/spec:/a \ \ \ \ imagePullSecrets:\n \ \ \ \ \ \ - name: regcred' "$FILE"
+      
+              # Fix image references
+              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
       
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
