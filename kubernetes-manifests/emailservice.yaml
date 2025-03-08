@@ -20,6 +20,8 @@ metadata:
   labels:
     app: emailservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: emailservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: emailservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: emailservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -36,7 +40,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      imagePullSecrets:
         - name: regcred
       - name: server
         securityContext:
@@ -70,6 +73,8 @@ metadata:
   labels:
     app: emailservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: emailservice

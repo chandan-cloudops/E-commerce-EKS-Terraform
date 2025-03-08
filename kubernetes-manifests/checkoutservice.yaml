@@ -20,6 +20,8 @@ metadata:
   labels:
     app: checkoutservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: checkoutservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: checkoutservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: checkoutservice
       securityContext:
         fsGroup: 1000
@@ -35,7 +39,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      imagePullSecrets:
         - name: regcred
         - name: server
           securityContext:
@@ -77,6 +80,8 @@ metadata:
   labels:
     app: checkoutservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: checkoutservice

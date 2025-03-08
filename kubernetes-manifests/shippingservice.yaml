@@ -20,6 +20,8 @@ metadata:
   labels:
     app: shippingservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: shippingservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: shippingservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: shippingservice
       securityContext:
         fsGroup: 1000
@@ -35,7 +39,6 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
-      imagePullSecrets:
         - name: regcred
       - name: server
         securityContext:
@@ -68,6 +71,8 @@ metadata:
   labels:
     app: shippingservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: shippingservice
