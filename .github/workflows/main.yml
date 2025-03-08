@@ -59,13 +59,16 @@ jobs:
               # Update image reference
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
 
-              # Remove existing imagePullSecrets and set only regcred
-              sed -i "/imagePullSecrets:/,/name:/d" "$FILE"
+              # Remove existing imagePullSecrets completely
+              sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
+
+              # Add only regcred under imagePullSecrets
               sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' "$FILE"
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
             fi
           done
+
 
 
 
