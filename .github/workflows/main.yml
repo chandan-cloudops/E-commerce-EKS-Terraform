@@ -58,7 +58,7 @@ jobs:
               echo "🔄 Fixing $FILE..." 
               # Fix image references
               sed -i "s|image: .*|image: $DOCKER_HUB/public:$service|g" "$FILE"
-      
+    
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
             fi
