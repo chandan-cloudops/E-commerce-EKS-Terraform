@@ -21,6 +21,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: server
         securityContext:
           allowPrivilegeEscalation: false
@@ -47,8 +49,6 @@ spec:
           httpGet:
             path: /healthz
             port: 8080
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # Secret for ACR access
 ---
 apiVersion: v1

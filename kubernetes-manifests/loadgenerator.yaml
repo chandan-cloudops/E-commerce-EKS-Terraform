@@ -39,8 +39,6 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # ACR authentication secret
       initContainers:
       - name: frontend-check
@@ -74,6 +72,8 @@ spec:
         - name: FRONTEND_ADDR
           value: "frontend:80"
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: main
         image: cloudops96/private:loadgenerator
         securityContext:

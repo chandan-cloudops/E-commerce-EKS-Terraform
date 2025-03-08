@@ -35,6 +35,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
         - name: server
           securityContext:
             allowPrivilegeEscalation: false
@@ -67,8 +69,6 @@ spec:
             value: "currencyservice:7000"
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # Reference the ACR secret here
 ---
 apiVersion: v1

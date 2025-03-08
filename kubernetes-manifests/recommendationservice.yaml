@@ -36,6 +36,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: server
         securityContext:
           allowPrivilegeEscalation: false
@@ -62,8 +64,6 @@ spec:
           value: "productcatalogservice:3550"
         - name: DISABLE_PROFILER
           value: "1"
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # ACR authentication secret
 ---
 apiVersion: v1

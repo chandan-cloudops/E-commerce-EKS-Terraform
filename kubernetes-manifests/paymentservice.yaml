@@ -36,6 +36,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: server
         securityContext:
           allowPrivilegeEscalation: false
@@ -58,8 +60,6 @@ spec:
         livenessProbe:
           grpc:
             port: 50051
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # ACR authentication secret
 ---
 apiVersion: v1

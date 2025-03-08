@@ -36,6 +36,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: server
         securityContext:
           allowPrivilegeEscalation: false
@@ -59,8 +61,6 @@ spec:
           periodSeconds: 10
           grpc:
             port: 7070
-      imagePullSecrets:
-        - name: regcred
       - name: acr-auth  # Reference the secret for pulling from ACR
 ---
 apiVersion: v1
@@ -104,6 +104,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
       - name: redis
         securityContext:
           allowPrivilegeEscalation: false
