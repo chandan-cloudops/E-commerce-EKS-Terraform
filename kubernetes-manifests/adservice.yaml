@@ -61,7 +61,6 @@ spec:
           periodSeconds: 15
           grpc:
             port: 9555
-      - name: acr-auth  # Secret for ACR access
 ---
 apiVersion: v1
 kind: Service

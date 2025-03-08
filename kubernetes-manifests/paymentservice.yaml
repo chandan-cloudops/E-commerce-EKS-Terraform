@@ -60,7 +60,6 @@ spec:
         livenessProbe:
           grpc:
             port: 50051
-      - name: acr-auth  # ACR authentication secret
 ---
 apiVersion: v1
 kind: Service

@@ -62,7 +62,6 @@ spec:
           periodSeconds: 5
           grpc:
             port: 8080
-      - name: acr-auth  # Reference to the ACR secret
 ---
 apiVersion: v1
 kind: Service

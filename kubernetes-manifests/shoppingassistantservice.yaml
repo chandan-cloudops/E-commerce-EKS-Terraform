@@ -49,7 +49,6 @@ spec:
           httpGet:
             path: /healthz
             port: 8080
-      - name: acr-auth  # Secret for ACR access
 ---
 apiVersion: v1
 kind: Service

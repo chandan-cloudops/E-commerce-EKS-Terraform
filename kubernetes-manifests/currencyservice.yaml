@@ -61,7 +61,6 @@ spec:
         livenessProbe:
           grpc:
             port: 7000
-      - name: acr-auth  # Reference the ACR secret here
 ---
 apiVersion: v1
 kind: Service

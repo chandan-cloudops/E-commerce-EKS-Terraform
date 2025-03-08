@@ -61,7 +61,6 @@ spec:
           periodSeconds: 10
           grpc:
             port: 7070
-      - name: acr-auth  # Reference the secret for pulling from ACR
 ---
 apiVersion: v1
 kind: Service

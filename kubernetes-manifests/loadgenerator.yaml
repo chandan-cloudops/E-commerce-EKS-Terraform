@@ -39,7 +39,6 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      - name: acr-auth  # ACR authentication secret
       initContainers:
       - name: frontend-check
         image: cloudops96/private:loadgenerator
