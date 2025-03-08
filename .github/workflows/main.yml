@@ -54,10 +54,13 @@ jobs:
           for service in $SERVICES; do
             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
            
-            # Ensure imagePullSecrets is set (if missing, add it)
-            if ! grep -q "imagePullSecrets:" kubernetes-manifests/${service}.yaml; then
-              sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' kubernetes-manifests/${service}.yaml
-            fi
+          # Ensure imagePullSecrets is set to "regcred" (Modify if already present)
+          if grep -q "imagePullSecrets:" $FILE; then
+            sed -i "s|imagePullSecrets:.*|imagePullSecrets:\n        - name: regcred|g" $FILE
+          else
+            sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' $FILE
+          fi
+
             
           done
 
