@@ -47,26 +47,18 @@ jobs:
         with:
           persist-credentials: false  # ✅ Prevents GitHub Actions from using its own credentials
 
-      - name: Update Kubernetes manifests
+      - name: Remove imagePullSecrets from Kubernetes manifests
         run: |
-          DOCKER_HUB=cloudops96
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
             FILE="kubernetes-manifests/${service}.yaml"
       
             if [ -f "$FILE" ]; then
-              # Update image reference
-              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
+              echo "🗑 Removing imagePullSecrets from $FILE..."
       
-              # Remove the specific line with `- name: acr-auth`
-              sed -i '/- name: acr-auth/d' "$FILE"
-      
-              # Remove only existing `imagePullSecrets:` (not the whole block)
-              sed -i '/imagePullSecrets:/d' "$FILE"
-              
-              # Ensure `imagePullSecrets` is added **below `spec:`**
-              sed -i '/spec:/a \ \ \ \ imagePullSecrets:\n \ \ \ \ \ \ - name: regcred' "$FILE"
+              # Remove all occurrences of imagePullSecrets and its child elements
+              sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
       
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
