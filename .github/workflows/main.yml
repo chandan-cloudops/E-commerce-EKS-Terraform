@@ -55,21 +55,20 @@ jobs:
           for service in $SERVICES; do
             FILE="kubernetes-manifests/${service}.yaml"
 
-            # Ensure the file exists before modifying
             if [ -f "$FILE" ]; then
               # Update image reference
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
 
-              # Ensure imagePullSecrets is set to "regcred" (Modify if already present)
-              if grep -q "imagePullSecrets:" "$FILE"; then
-                sed -i "/imagePullSecrets:/c\      imagePullSecrets:\n        - name: regcred" "$FILE"
-              else
-                sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' "$FILE"
-              fi
+              # Remove any existing imagePullSecrets to avoid duplicates
+              sed -i "/imagePullSecrets:/,/name:/d" "$FILE"
+
+              # Add the correct imagePullSecrets entry under containers:
+              sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' "$FILE"
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
             fi
           done
+
 
 
       - name: Commit and push changes to GitHub
