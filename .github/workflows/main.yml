@@ -25,18 +25,18 @@ jobs:
           username: chandan.cloudops@gmail.com
           password: D7204181C@#123
 
-      - name: Build and push Docker images
-        run: |
-          DOCKER_HUB=cloudops96
-          SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-          for service in $SERVICES; do
-            if [ "$service" = "cartservice" ]; then
-              docker build -t $DOCKER_HUB/private:$service ./src/$service/src
-            else
-              docker build -t $DOCKER_HUB/private:$service ./src/$service
-            fi
-            docker push $DOCKER_HUB/private:$service
-          done
+      # - name: Build and push Docker images
+      #   run: |
+      #     DOCKER_HUB=cloudops96
+      #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+      #     for service in $SERVICES; do
+      #       if [ "$service" = "cartservice" ]; then
+      #         docker build -t $DOCKER_HUB/private:$service ./src/$service/src
+      #       else
+      #         docker build -t $DOCKER_HUB/private:$service ./src/$service
+      #       fi
+      #       docker push $DOCKER_HUB/private:$service
+      #     done
 
   update_manifests:
     runs-on: ubuntu-latest
@@ -53,6 +53,12 @@ jobs:
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
           for service in $SERVICES; do
             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
+           
+            # Ensure imagePullSecrets is set (if missing, add it)
+            if ! grep -q "imagePullSecrets:" kubernetes-manifests/${service}.yaml; then
+              sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' kubernetes-manifests/${service}.yaml
+            fi
+            
           done
 
       - name: Commit and push changes to GitHub
