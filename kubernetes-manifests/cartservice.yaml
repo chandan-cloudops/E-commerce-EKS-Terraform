@@ -111,7 +111,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/public:cartservice
+        image: redis:alpine
         ports:
         - containerPort: 6379
         readinessProbe:
