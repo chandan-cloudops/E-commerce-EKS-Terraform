@@ -36,6 +36,8 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
+      imagePullSecrets:
+        - name: regcred
         - name: server
           securityContext:
             allowPrivilegeEscalation: false
