@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: chandancloudops96.azurecr.io/productcatalogservice:latest  # ACR image path
+        image: cloudops96/public:productcatalogservice
         ports:
         - containerPort: 3550
         env:

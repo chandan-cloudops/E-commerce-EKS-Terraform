@@ -44,7 +44,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: frontend
+          image: cloudops96/public:frontend
           ports:
           - containerPort: 8080
           readinessProbe:
