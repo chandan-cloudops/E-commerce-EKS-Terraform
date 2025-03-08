@@ -19,8 +19,6 @@ metadata:
   labels:
     app: frontend
 spec:
-    imagePullSecrets:
-       - name: regcred
   selector:
     matchLabels:
       app: frontend
@@ -31,8 +29,6 @@ spec:
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
-    imagePullSecrets:
-       - name: regcred
       serviceAccountName: frontend
       securityContext:
         fsGroup: 1000
@@ -98,8 +94,6 @@ metadata:
   labels:
     app: frontend
 spec:
-    imagePullSecrets:
-       - name: regcred
   type: ClusterIP
   selector:
     app: frontend
@@ -115,8 +109,6 @@ metadata:
   labels:
     app: frontend
 spec:
-    imagePullSecrets:
-       - name: regcred
   type: ClusterIP
   selector:
     app: frontend
