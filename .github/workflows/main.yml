@@ -51,18 +51,26 @@ jobs:
         run: |
           DOCKER_HUB=cloudops96
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-          for service in $SERVICES; do
-            sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" kubernetes-manifests/${service}.yaml
-           
-          # Ensure imagePullSecrets is set to "regcred" (Modify if already present)
-          if grep -q "imagePullSecrets:" $FILE; then
-            sed -i "s|imagePullSecrets:.*|imagePullSecrets:\n        - name: regcred|g" $FILE
-          else
-            sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' $FILE
-          fi
 
-            
+          for service in $SERVICES; do
+            FILE="kubernetes-manifests/${service}.yaml"
+
+            # Ensure the file exists before modifying
+            if [ -f "$FILE" ]; then
+              # Update image reference
+              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
+
+              # Ensure imagePullSecrets is set to "regcred" (Modify if already present)
+              if grep -q "imagePullSecrets:" "$FILE"; then
+                sed -i "/imagePullSecrets:/c\      imagePullSecrets:\n        - name: regcred" "$FILE"
+              else
+                sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' "$FILE"
+              fi
+            else
+              echo "⚠️ Warning: $FILE not found. Skipping..."
+            fi
           done
+
 
       - name: Commit and push changes to GitHub
         env:
