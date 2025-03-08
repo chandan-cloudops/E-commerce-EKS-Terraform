@@ -51,26 +51,28 @@ jobs:
         run: |
           DOCKER_HUB=cloudops96
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-
+      
           for service in $SERVICES; do
             FILE="kubernetes-manifests/${service}.yaml"
-
+      
             if [ -f "$FILE" ]; then
               # Update image reference
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
-
+      
               # Remove the specific line with `- name: acr-auth`
               sed -i '/- name: acr-auth/d' "$FILE"
-
-              # Remove existing imagePullSecrets completely
-              sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
-
-              # Add only regcred under imagePullSecrets
-              sed -i '/containers:/a \      imagePullSecrets:\n        - name: regcred' "$FILE"
+      
+              # Remove only existing `imagePullSecrets:` (not the whole block)
+              sed -i '/imagePullSecrets:/d' "$FILE"
+              
+              # Ensure `imagePullSecrets` is added **below `spec:`**
+              sed -i '/spec:/a \ \ \ \ imagePullSecrets:\n \ \ \ \ \ \ - name: regcred' "$FILE"
+      
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
             fi
           done
+
 
 
 
