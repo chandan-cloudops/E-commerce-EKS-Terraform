@@ -20,6 +20,8 @@ metadata:
   labels:
     app: productcatalogservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: productcatalogservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: productcatalogservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: productcatalogservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -67,6 +71,8 @@ metadata:
   labels:
     app: productcatalogservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: productcatalogservice

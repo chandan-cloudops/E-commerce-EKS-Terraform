@@ -5,6 +5,8 @@ metadata:
   labels:
     app: shoppingassistantservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: shoppingassistantservice
@@ -13,6 +15,8 @@ spec:
       labels:
         app: shoppingassistantservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: shoppingassistantservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -56,6 +60,8 @@ metadata:
   labels:
     app: shoppingassistantservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: shoppingassistantservice

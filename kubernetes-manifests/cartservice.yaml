@@ -20,6 +20,8 @@ metadata:
   labels:
     app: cartservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: cartservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: cartservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: cartservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -68,6 +72,8 @@ metadata:
   labels:
     app: cartservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: cartservice
@@ -88,6 +94,8 @@ metadata:
   labels:
     app: redis-cart
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: redis-cart
@@ -96,6 +104,8 @@ spec:
       labels:
         app: redis-cart
     spec:
+    imagePullSecrets:
+       - name: regcred
       securityContext:
         fsGroup: 1000
         runAsGroup: 1000
@@ -136,6 +146,8 @@ metadata:
   labels:
     app: redis-cart
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: redis-cart

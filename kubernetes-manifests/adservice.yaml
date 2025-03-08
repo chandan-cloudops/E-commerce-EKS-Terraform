@@ -19,6 +19,8 @@ metadata:
   labels:
     app: adservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: adservice
@@ -27,6 +29,8 @@ spec:
       labels:
         app: adservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: adservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -68,6 +72,8 @@ metadata:
   labels:
     app: adservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: adservice

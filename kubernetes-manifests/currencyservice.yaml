@@ -20,6 +20,8 @@ metadata:
   labels:
     app: currencyservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: currencyservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: currencyservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: currencyservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -68,6 +72,8 @@ metadata:
   labels:
     app: currencyservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: currencyservice

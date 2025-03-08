@@ -20,6 +20,8 @@ metadata:
   labels:
     app: recommendationservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   selector:
     matchLabels:
       app: recommendationservice
@@ -28,6 +30,8 @@ spec:
       labels:
         app: recommendationservice
     spec:
+    imagePullSecrets:
+       - name: regcred
       serviceAccountName: recommendationservice
       terminationGracePeriodSeconds: 5
       securityContext:
@@ -71,6 +75,8 @@ metadata:
   labels:
     app: recommendationservice
 spec:
+    imagePullSecrets:
+       - name: regcred
   type: ClusterIP
   selector:
     app: recommendationservice
