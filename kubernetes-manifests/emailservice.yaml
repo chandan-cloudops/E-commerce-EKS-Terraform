@@ -61,6 +61,7 @@ spec:
           grpc:
             port: 8080
       imagePullSecrets:
+        - name: regcred
       - name: acr-auth  # Reference to the ACR secret
 ---
 apiVersion: v1

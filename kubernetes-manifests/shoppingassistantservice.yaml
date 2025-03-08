@@ -48,6 +48,7 @@ spec:
             path: /healthz
             port: 8080
       imagePullSecrets:
+        - name: regcred
       - name: acr-auth  # Secret for ACR access
 ---
 apiVersion: v1

@@ -59,6 +59,7 @@ spec:
           grpc:
             port: 50051
       imagePullSecrets:
+        - name: regcred
       - name: acr-auth  # ACR authentication secret
 ---
 apiVersion: v1

@@ -68,6 +68,7 @@ spec:
           - name: CART_SERVICE_ADDR
             value: "cartservice:7070"
       imagePullSecrets:
+        - name: regcred
       - name: acr-auth  # Reference the ACR secret here
 ---
 apiVersion: v1

@@ -63,6 +63,7 @@ spec:
         - name: DISABLE_PROFILER
           value: "1"
       imagePullSecrets:
+        - name: regcred
       - name: acr-auth  # ACR authentication secret
 ---
 apiVersion: v1

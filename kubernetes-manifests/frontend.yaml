@@ -38,6 +38,7 @@ spec:
       containers:
       imagePullSecrets:
         - name: regcred
+        - name: regcred
         - name: server
           securityContext:
             allowPrivilegeEscalation: false
