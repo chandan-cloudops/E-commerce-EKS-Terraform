@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:productcatalogservice
+        image: cloudops96/public:productcatalogservice
         ports:
         - containerPort: 3550
         env:

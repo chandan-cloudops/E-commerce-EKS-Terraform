@@ -44,7 +44,7 @@ spec:
                 - ALL
             privileged: false
             readOnlyRootFilesystem: true
-          image: cloudops96/private:checkoutservice
+          image: cloudops96/public:checkoutservice
           ports:
           - containerPort: 5050
           readinessProbe:

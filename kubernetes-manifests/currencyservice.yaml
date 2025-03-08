@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:currencyservice
+        image: cloudops96/public:currencyservice
         ports:
         - name: grpc
           containerPort: 7000

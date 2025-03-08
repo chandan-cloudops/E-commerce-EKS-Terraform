@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:paymentservice
+        image: cloudops96/public:paymentservice
         ports:
         - containerPort: 50051
         env:

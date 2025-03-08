@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:emailservice
+        image: cloudops96/public:emailservice
         ports:
         - containerPort: 8080
         env:

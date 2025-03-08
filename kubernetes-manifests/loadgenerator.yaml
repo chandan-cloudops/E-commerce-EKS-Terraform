@@ -41,7 +41,7 @@ spec:
         runAsUser: 1000
       initContainers:
       - name: frontend-check
-        image: cloudops96/private:loadgenerator
+        image: cloudops96/public:loadgenerator
         command:
         - /bin/sh
         - -c
@@ -73,7 +73,7 @@ spec:
       containers:
         - name: regcred
       - name: main
-        image: cloudops96/private:loadgenerator
+        image: cloudops96/public:loadgenerator
         securityContext:
           allowPrivilegeEscalation: false
           capabilities:

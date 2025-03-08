@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:shippingservice
+        image: cloudops96/public:shippingservice
         ports:
         - containerPort: 50051
         env:

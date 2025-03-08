@@ -30,7 +30,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:shoppingassistantservice
+        image: cloudops96/public:shoppingassistantservice
         ports:
         - containerPort: 8080
         env:

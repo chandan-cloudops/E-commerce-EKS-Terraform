@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:recommendationservice
+        image: cloudops96/public:recommendationservice
         ports:
         - containerPort: 8080
         readinessProbe:

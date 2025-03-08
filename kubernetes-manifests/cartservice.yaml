@@ -45,7 +45,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:cartservice
+        image: cloudops96/public:cartservice
         ports:
         - containerPort: 7070
         env:
@@ -111,7 +111,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:cartservice
+        image: cloudops96/public:cartservice
         ports:
         - containerPort: 6379
         readinessProbe:

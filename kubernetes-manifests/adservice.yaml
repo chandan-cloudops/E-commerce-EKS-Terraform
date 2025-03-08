@@ -44,7 +44,7 @@ spec:
               - ALL
           privileged: false
           readOnlyRootFilesystem: true
-        image: cloudops96/private:adservice
+        image: cloudops96/public:adservice
         ports:
         - containerPort: 9555
         env:
