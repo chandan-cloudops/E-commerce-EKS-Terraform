@@ -55,14 +55,9 @@ jobs:
             FILE="kubernetes-manifests/${service}.yaml"
       
             if [ -f "$FILE" ]; then
-              echo "🔄 Fixing $FILE..."
-      
-              # Remove any existing imagePullSecrets occurrences
-              sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
-      
-              
+              echo "🔄 Fixing $FILE..." 
               # Fix image references
-              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
+              sed -i "s|image: .*|image: $DOCKER_HUB/public:$service|g" "$FILE"
       
             else
               echo "⚠️ Warning: $FILE not found. Skipping..."
