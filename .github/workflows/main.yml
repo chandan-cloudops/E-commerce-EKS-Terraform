@@ -59,6 +59,14 @@ jobs:
               # Update image reference
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
 
+
+               # Remove the specific line with `- name: acr-auth`
+              sed -i '/- name: acr-auth/d' "$FILE"
+
+            else
+              echo "⚠️ Warning: $FILE not found. Skipping..."
+            fi
+
               # Remove existing imagePullSecrets completely
               sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
 
