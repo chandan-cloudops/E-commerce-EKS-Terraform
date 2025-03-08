@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: static-web-app-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+    kubernetes.io/ingress.class: nginx  # Using NGINX Ingress Controller, adjust if using another
+spec:
+  rules:
+  - host: chandan.cloudops.quest  # Replace with your domain name
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: static-web-app-service
+            port:
+              number: 80
+
+  tls:
+  - hosts:
+    - chandan.cloudops.quest
+    secretName: chandan.cloudops.quest            
