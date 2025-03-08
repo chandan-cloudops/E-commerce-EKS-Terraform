@@ -60,9 +60,7 @@ jobs:
               # Remove any existing imagePullSecrets occurrences
               sed -i '/imagePullSecrets:/,/name:/d' "$FILE"
       
-              # Ensure imagePullSecrets is added correctly under 'spec'
-              sed -i '/spec:/a \ \ \ \ imagePullSecrets:\n \ \ \ \ \ \ - name: regcred' "$FILE"
-      
+              
               # Fix image references
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service|g" "$FILE"
       
