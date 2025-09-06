@@ -100,7 +100,7 @@ jobs:
       - name: Create PR from staging → main
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GIT_TOKEN }}
+          token: ${{ secrets.GIT_PASSWORD }}
           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
           commit-message: "Sync deployment manifests (build #${{ github.run_number }})"
           branch: "sync-staging-${{ github.run_number }}"   # ✅ unique branch
