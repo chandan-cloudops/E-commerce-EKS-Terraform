@@ -114,8 +114,8 @@ jobs:
     secrets:
       # AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
       # AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
-      GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
-      GIT_PASSWORD: ${{ secrets.PASSWORD }}
+      GIT_USERNAME: ${{ secrets.STAGING_GIT_USERNAME }}
+      GIT_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
