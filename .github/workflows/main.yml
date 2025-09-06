@@ -106,7 +106,7 @@ jobs:
   staging:
     name: Deploy to Staging GKE
     if: ${{ github.ref == 'refs/heads/staging' }}
-    uses: chandan-cloudops/Production_Grade_CICD_GitHub_Action/blob/main/.github/workflows/_deployment.yaml@staging
+    uses: chandan-cloudops/E-commerce-EKS-Terraform/blob/main/.github/workflows/_deployment.yaml@staging
     with:
       environment: staging
       env_id: stg
