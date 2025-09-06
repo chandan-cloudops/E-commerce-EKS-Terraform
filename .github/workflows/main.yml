@@ -112,8 +112,8 @@ jobs:
       env_id: stg
       ref: ${{ github.sha }}
     secrets:
-      AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
-      AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
+      # AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
+      # AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
       GIT_USERNAME: ${{ secrets.STAGING_GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.STAGING_GIT_PASSWORD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
