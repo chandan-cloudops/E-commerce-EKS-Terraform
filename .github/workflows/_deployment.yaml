@@ -101,9 +101,10 @@ jobs:
         run: |
           gh pr create \
             --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
-            --head sync-staging-${{ github.run_number }} \
+            --head staging \
             --base main \
             --title "Sync manifests from staging to main (build #${{ github.run_number }})" \
             --body "This PR updates deployment manifests in main branch with the latest Docker images built from build #${{ github.run_number }}."
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # must be a PAT with `repo` scope
+          GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with `repo` scope
+
