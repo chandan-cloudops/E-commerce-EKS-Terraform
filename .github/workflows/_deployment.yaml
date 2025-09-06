@@ -58,14 +58,14 @@ jobs:
   modify_git:
     needs: build
     runs-on: ubuntu-latest
-    # environment: ${{ inputs.environment }}
+    environment: ${{ inputs.environment }}
     steps:
       - name: Checkout deployment repo (staging branch)
         uses: actions/checkout@v3
         with:
           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
           ref: staging
-          token: '${{ secrets.GIT_PASSWORD }}'
+          token: ${{ secrets.GIT_PASSWORD }}
           fetch-depth: 0
 
       - name: Update Kubernetes manifests
