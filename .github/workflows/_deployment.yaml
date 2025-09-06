@@ -58,7 +58,7 @@ jobs:
   modify_git:
     needs: build
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
+    # environment: ${{ inputs.environment }}
     steps:
       - name: Checkout deployment repo (staging branch)
         uses: actions/checkout@v3
