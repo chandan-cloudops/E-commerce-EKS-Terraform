@@ -92,16 +92,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add kubernetes-manifests/
+          git status
+          git diff --cached
           git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
           git push origin staging
-
+  
       - name: Create PR from staging → main
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GIT_PASSWORD }}
+          token: ${{ secrets.GIT_TOKEN }}
           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
           commit-message: "Sync deployment manifests (build #${{ github.run_number }})"
-          branch: staging
+          branch: "sync-staging-${{ github.run_number }}"   # ✅ unique branch
           base: main
           title: "Sync manifests from staging to main (build #${{ github.run_number }})"
           body: |
