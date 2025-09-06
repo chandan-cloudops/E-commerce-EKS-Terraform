@@ -67,9 +67,7 @@ jobs:
         with:
           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
           ref: staging
-          # ✅ Use fallback if GIT_TOKEN exists, otherwise default to GITHUB_TOKEN
-          token: ${{ secrets.GIT_TOKEN || secrets.GITHUB_TOKEN }}
-          # token:  ${{ secrets.GIT_PASSWORD }}
+          token:  ${{ secrets.GIT_PASSWORD }}
           fetch-depth: 0
 
       - name: Update Kubernetes manifests
