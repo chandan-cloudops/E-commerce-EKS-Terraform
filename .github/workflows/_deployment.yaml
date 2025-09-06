@@ -16,10 +16,10 @@ on:
         required: true
         type: string
     secrets:
-      # GIT_USERNAME:
-      #   required: true
-      # GIT_PASSWORD:
-      #   required: true
+      GIT_USERNAME:
+        required: true
+      GIT_PASSWORD:
+        required: true
       GIT_TOKEN:   # ✅ optional fallback PAT
         required: false
       DOCKERHUB_USERNAME:
