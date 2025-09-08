@@ -122,7 +122,7 @@ jobs:
   production:
     name: Deploy to Production GKE
     if: ${{ github.ref == 'refs/heads/main' }}
-    uses: Lianecare/lianecare-backend/.github/workflows/_deployment.yaml@main
+    uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@main
     with:
       environment: production
       env_id: prod
