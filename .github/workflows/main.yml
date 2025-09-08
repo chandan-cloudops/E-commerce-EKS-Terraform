@@ -100,7 +100,7 @@ on:
   push:
     branches:
       - staging
-      # - main
+      - main
 
 jobs:
   staging:
