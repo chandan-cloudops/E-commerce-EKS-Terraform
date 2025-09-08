@@ -112,22 +112,26 @@ jobs:
       env_id: stg
       ref: ${{ github.sha }}
     secrets:
-      AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
-      AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
-      GIT_USERNAME: ${{ secrets.STAGING_GIT_USERNAME }}
-      GIT_PASSWORD: ${{ secrets.STAGING_GIT_PASSWORD }}
+      # AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
+      # AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
+      GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+      GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
-  # production:
-  #   name: Deploy to Production GKE
-  #   if: ${{ github.ref == 'refs/heads/main' }}
-  #   uses: Lianecare/lianecare-backend/.github/workflows/_deployment.yaml@main
-  #   with:
-  #     environment: production
-  #     env_id: prod
-  #     ref: ${{ github.sha }}
-  #   secrets:
-  #     ACCESS_TOKEN: ${{ secrets.PROD_ACCESS_TOKEN }}
-  #     GIT_USERNAME: ${{ secrets.PROD_GIT_USERNAME }}
-  #     GIT_PASSWORD: ${{ secrets.PROD_GIT_PASSWORD }}
+  production:
+    name: Deploy to Production GKE
+    if: ${{ github.ref == 'refs/heads/main' }}
+    uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@main
+    with:
+      environment: production
+      env_id: prod
+      ref: ${{ github.sha }}
+    secrets:
+      # ACCESS_TOKEN: ${{ secrets.PROD_ACCESS_TOKEN }}
+      # GIT_USERNAME: ${{ secrets.PROD_GIT_USERNAME }}
+      # GIT_PASSWORD: ${{ secrets.PROD_GIT_PASSWORD }}
+      GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+      GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
