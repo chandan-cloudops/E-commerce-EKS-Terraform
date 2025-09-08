@@ -133,23 +133,84 @@ jobs:
   #       env:
   #         GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with `repo` scope
   
+  # modify_git:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment: ${{ inputs.environment }}
+  #   steps:
+  #     - name: Checkout deployment repo (staging branch)
+  #       uses: actions/checkout@v3
+  #       with:
+  #         repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
+  #         ref: staging
+  #         token: ${{ secrets.GIT_PASSWORD }}
+  #         fetch-depth: 0
+  
+  #     - name: Update Kubernetes manifests
+  #       run: |
+  #         DOCKER_HUB=cloudops96
+  #         BUILD_TAG=${{ github.run_number }}
+  #         SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+      
+  #         for service in $SERVICES; do
+  #           FILE="kubernetes-manifests/${service}.yaml"
+  #           if [ -f "$FILE" ]; then
+  #             echo "🔄 Updating $FILE..."
+  #             sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
+  #           else
+  #             echo "⚠️ $FILE not found. Skipping..."
+  #           fi
+  #         done
+  
+  #     - name: Commit and push changes
+  #       run: |
+  #         git config user.name "github-actions[bot]"
+  #         git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+  #         git add kubernetes-manifests/
+  #         git status
+  #         git diff --cached
+  #         git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
+  #         git push origin staging
+  
+  #     - name: Create PR in deployment repo
+  #       if: ${{ inputs.environment == 'production' }}
+  #       run: |
+  #         gh pr create \
+  #           --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
+  #           --head staging \
+  #           --base main \
+  #           --title "Sync manifests from staging to main (build #${{ github.run_number }})" \
+  #           --body "This PR updates deployment manifests in main branch with the latest Docker images built from build #${{ github.run_number }}."
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with repo scope
+  
+
   modify_git:
     needs: build
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
-      - name: Checkout deployment repo (staging branch)
+      - name: Checkout deployment repo
         uses: actions/checkout@v3
         with:
           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
-          ref: staging
+          ref: ${{ inputs.environment == 'production' && 'releasing' || 'staging' }}
           token: ${{ secrets.GIT_PASSWORD }}
           fetch-depth: 0
   
       - name: Update Kubernetes manifests
         run: |
           DOCKER_HUB=cloudops96
-          BUILD_TAG=${{ github.run_number }}
+  
+          if [ "${{ inputs.environment }}" = "production" ]; then
+            PREFIX="prod"
+          else
+            PREFIX="stage"
+          fi
+  
+          BUILD_TAG="${PREFIX}-${{ github.run_number }}"
+          echo "📌 Updating manifests with tag: $BUILD_TAG"
+  
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
@@ -171,17 +232,16 @@ jobs:
           git status
           git diff --cached
           git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
-          git push origin staging
+          git push origin HEAD
   
-      - name: Create PR in deployment repo
+      - name: Create PR (production only)
         if: ${{ inputs.environment == 'production' }}
         run: |
           gh pr create \
             --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
-            --head staging \
+            --head releasing \
             --base main \
-            --title "Sync manifests from staging to main (build #${{ github.run_number }})" \
+            --title "Sync manifests from releasing to main (build #${{ github.run_number }})" \
             --body "This PR updates deployment manifests in main branch with the latest Docker images built from build #${{ github.run_number }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with repo scope
-  
