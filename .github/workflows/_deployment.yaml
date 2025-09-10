@@ -226,21 +226,24 @@ jobs:
             fi
    
           done
-           - name: Commit and push updated manifests
-            run: |
-              git add .
-              git commit -m "Update manifests with new image $IMAGE (build #${{ github.run_number }})" || echo "No changes to commit"
-              git push origin HEAD
+     # - name: Commit and push updated manifests
+     #  run: |
+     #    git add .
+     #    git commit -m "Update manifests with new image $IMAGE (build #${{ github.run_number }})" || echo "No changes to commit"
+     #    git push origin HEAD
  
-      # - name: Commit and push changes
-      #   run: |
-      #     git config user.name "github-actions[bot]"
-      #     git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      #     git add kubernetes-manifests/
-      #     git status
-      #     git diff --cached
-      #     git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
-      #     git push origin HEAD
+      - name: Commit and push changes
+        run: |
+          # git config user.name "github-actions[bot]"
+          # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # git add kubernetes-manifests/
+          # git status
+          # git diff --cached
+          # git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
+          # git push origin HEAD
+          git add .
+          git commit -m "Update manifests with new image $IMAGE (build #${{ github.run_number }})" || echo "No changes to commit"
+          git push origin HEAD
   
       - name: Create PR (production only)
         if: ${{ inputs.environment == 'production' }}
