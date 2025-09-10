@@ -245,8 +245,6 @@
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with repo scope
 
-
-
 name: Reusable Deployment Workflow
 
 on:
@@ -453,31 +451,33 @@ jobs:
       - name: Update Kubernetes manifests
         run: |
           DOCKER_HUB=cloudops96
-  
+      
+          # Decide tag prefix, folder, and file suffix based on environment
           if [ "${{ inputs.environment }}" = "production" ]; then
             PREFIX="prod"
             FOLDER="production_deployment_files"
+            SUFFIX="prod"
           else
             PREFIX="stage"
             FOLDER="staging_deployments_files"
+            SUFFIX="test"
           fi
-  
+      
           BUILD_TAG="${PREFIX}-${{ github.run_number }}"
           echo "📌 Updating manifests with tag: $BUILD_TAG"
-  
+      
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
-            FILE="$FOLDER/${service}.yaml"
+            FILE="$FOLDER/${service}-${SUFFIX}.yaml"   # 👈 use suffix in file name
             if [ -f "$FILE" ]; then
               echo "🔄 Updating $FILE..."
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
             else
               echo "⚠️ $FILE not found. Skipping..."
             fi
-   
           done
- 
+
       - name: Commit and push updated manifests
         run: |
           git config --local user.name "${{ github.actor }}"
