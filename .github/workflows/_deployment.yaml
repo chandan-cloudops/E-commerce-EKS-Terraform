@@ -59,31 +59,31 @@ jobs:
 
 
       
-      - name: Build and push Docker images
-        run: |
-          DOCKER_HUB=cloudops96
+      # - name: Build and push Docker images
+      #   run: |
+      #     DOCKER_HUB=cloudops96
       
-          # Decide tag prefix based on environment
-          if [ "${{ inputs.environment }}" = "production" ]; then
-            PREFIX="prod"
-          else
-            PREFIX="stage"
-          fi
+      #     # Decide tag prefix based on environment
+      #     if [ "${{ inputs.environment }}" = "production" ]; then
+      #       PREFIX="prod"
+      #     else
+      #       PREFIX="stage"
+      #     fi
       
-          BUILD_TAG="${PREFIX}-${{ github.run_number }}"
-          echo "📌 Using image tag: $BUILD_TAG"
+      #     BUILD_TAG="${PREFIX}-${{ github.run_number }}"
+      #     echo "📌 Using image tag: $BUILD_TAG"
       
-          SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+      #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
           
-          for service in $SERVICES; do
-            echo "🚀 Building and pushing $service:$BUILD_TAG..."
-            if [ "$service" = "cartservice" ]; then
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
-            else
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
-            fi
-            docker push $DOCKER_HUB/private:$service-$BUILD_TAG
-          done
+      #     for service in $SERVICES; do
+      #       echo "🚀 Building and pushing $service:$BUILD_TAG..."
+      #       if [ "$service" = "cartservice" ]; then
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+      #       else
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+      #       fi
+      #       docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+      #     done
 
   # modify_git:
   #   needs: build
@@ -236,13 +236,10 @@ jobs:
         run: |
           # git config user.name "github-actions[bot]"
           # git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          # git add kubernetes-manifests/
-          # git status
-          # git diff --cached
-          # git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
-          # git push origin HEAD
-          git add .
-          git commit -m "Update manifests with new image $IMAGE (build #${{ github.run_number }})" || echo "No changes to commit"
+          git add kubernetes-manifests/
+          git status
+          git diff --cached
+          git commit -m "Update manifests with new images (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
           git push origin HEAD
   
       - name: Create PR (production only)
