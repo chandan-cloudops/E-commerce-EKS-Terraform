@@ -256,5 +256,5 @@ jobs:
             --base main \
             --title "Sync manifests from releasing to main (build #${{ github.run_number }})" \
             --body "This PR updates deployment manifests in main branch with the latest Docker images built from build #${{ github.run_number }}."
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with repo scope
+        # env:
+        #   GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}   # PAT with repo scope
