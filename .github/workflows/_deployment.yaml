@@ -207,8 +207,10 @@ jobs:
   
           if [ "${{ inputs.environment }}" = "production" ]; then
             PREFIX="prod"
+            FOLDER="production_deployment_files"
           else
             PREFIX="stage"
+            FOLDER="staging_deployments_files"
           fi
   
           BUILD_TAG="${PREFIX}-${{ github.run_number }}"
@@ -217,7 +219,7 @@ jobs:
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
-            FILE="kubernetes-manifests/${service}.yaml"
+            FILE="$FOLDER/${service}.yaml"
             if [ -f "$FILE" ]; then
               echo "🔄 Updating $FILE..."
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
