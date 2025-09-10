@@ -233,7 +233,7 @@ jobs:
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
 
           if [ "${{ inputs.environment }}" = "production" ]; then
-            git production_deployment_files/
+            git add production_deployment_files/
           else
             git add staging_deployments_files/
           fi
