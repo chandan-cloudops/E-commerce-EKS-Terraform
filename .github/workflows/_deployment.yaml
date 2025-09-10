@@ -292,31 +292,31 @@ jobs:
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
       
-      - name: Build and push Docker images
-        run: |
-          DOCKER_HUB=cloudops96
+      # - name: Build and push Docker images
+      #   run: |
+      #     DOCKER_HUB=cloudops96
       
-          # Decide tag prefix based on environment
-          if [ "${{ inputs.environment }}" = "production" ]; then
-            PREFIX="prod"
-          else
-            PREFIX="stage"
-          fi
+      #     # Decide tag prefix based on environment
+      #     if [ "${{ inputs.environment }}" = "production" ]; then
+      #       PREFIX="prod"
+      #     else
+      #       PREFIX="stage"
+      #     fi
       
-          BUILD_TAG="${PREFIX}-${{ github.run_number }}"
-          echo "📌 Using image tag: $BUILD_TAG"
+      #     BUILD_TAG="${PREFIX}-${{ github.run_number }}"
+      #     echo "📌 Using image tag: $BUILD_TAG"
       
-          SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+      #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
           
-          for service in $SERVICES; do
-            echo "🚀 Building and pushing $service:$BUILD_TAG..."
-            if [ "$service" = "cartservice" ]; then
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
-            else
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
-            fi
-            docker push $DOCKER_HUB/private:$service-$BUILD_TAG
-          done
+      #     for service in $SERVICES; do
+      #       echo "🚀 Building and pushing $service:$BUILD_TAG..."
+      #       if [ "$service" = "cartservice" ]; then
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+      #       else
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+      #       fi
+      #       docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+      #     done
   
 
   modify_git:
@@ -348,7 +348,7 @@ jobs:
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
-            FILE="kubernetes-manifests/${service}.yaml"
+            FILE="staging_deployments_files/${service}.yaml"
             if [ -f "$FILE" ]; then
               echo "🔄 Updating $FILE..."
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
