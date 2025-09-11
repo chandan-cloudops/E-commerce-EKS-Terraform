@@ -138,6 +138,50 @@
 
 
 
+# name: CI/CD GKE Cluster
+
+# on:
+#   push:
+#     branches:
+#       - staging
+#       - main
+
+# jobs:
+#   staging:
+#     name: Deploy to Staging GKE
+#     if: ${{ github.ref == 'refs/heads/staging' }}
+#     uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@staging
+#     with:
+#       environment: staging
+#       env_id: stg
+#       ref: ${{ github.sha }}
+#       folder: staging_deployments_files
+#       branch: staging                     # ✅ added
+#       base_files: "celery-worker celerybeat flower solaace"   # ✅ added
+#     secrets:
+#       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+#       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+#       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#   production:
+#     name: Deploy to Production GKE
+#     if: ${{ github.ref == 'refs/heads/main' }}
+#     uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@main
+#     with:
+#       environment: production
+#       env_id: prod
+#       ref: ${{ github.sha }}
+#       folder: production_deployment_files
+#       branch: releasing                    # ✅ added
+#       base_files: "celery-worker celerybeat flower solaace"  # ✅ added
+#     secrets:
+#       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+#       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+#       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
 name: CI/CD GKE Cluster
 
 on:
@@ -147,36 +191,19 @@ on:
       - main
 
 jobs:
-  staging:
-    name: Deploy to Staging GKE
-    if: ${{ github.ref == 'refs/heads/staging' }}
-    uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@staging
+  deploy:
+    name: Deploy to GKE
+    # Call reusable deployment workflow from the branch that triggered the push
+    uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@${{ github.ref == 'refs/heads/main' && 'main' || 'staging' }}
     with:
-      environment: staging
-      env_id: stg
-      ref: ${{ github.sha }}
-      folder: staging_deployments_files
-      branch: staging                     # ✅ added
-      base_files: "celery-worker celerybeat flower solaace"   # ✅ added
+      # Pass environment inputs
+      environment: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      env_id: ${{ github.ref == 'refs/heads/main' && 'prod' || 'stg' }}
+      ref: ${{ github.sha }}  # Deploy exact commit that triggered workflow
     secrets:
+      # Git credentials
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-
-  production:
-    name: Deploy to Production GKE
-    if: ${{ github.ref == 'refs/heads/main' }}
-    uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@main
-    with:
-      environment: production
-      env_id: prod
-      ref: ${{ github.sha }}
-      folder: production_deployment_files
-      branch: releasing                    # ✅ added
-      base_files: "celery-worker celerybeat flower solaace"  # ✅ added
-    secrets:
-      GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
-      GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+      # DockerHub credentials
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
