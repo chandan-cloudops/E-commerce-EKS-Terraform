@@ -40,23 +40,23 @@ jobs:
       - name: Log in to DockerHub
         run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
 
-      - name: Build and push Docker images
-        run: |
-          DOCKER_HUB=cloudops96
-          BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
-          echo "📌 Using image tag: $BUILD_TAG"
+      # - name: Build and push Docker images
+      #   run: |
+      #     DOCKER_HUB=cloudops96
+      #     BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
+      #     echo "📌 Using image tag: $BUILD_TAG"
       
-          SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+      #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
           
-          for service in $SERVICES; do
-            echo "🚀 Building and pushing $service:$BUILD_TAG..."
-            if [ "$service" = "cartservice" ]; then
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
-            else
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
-            fi
-            docker push $DOCKER_HUB/private:$service-$BUILD_TAG
-          done
+      #     for service in $SERVICES; do
+      #       echo "🚀 Building and pushing $service:$BUILD_TAG..."
+      #       if [ "$service" = "cartservice" ]; then
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+      #       else
+      #         docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+      #       fi
+      #       docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+      #     done
 
   modify_git:
     needs: build
@@ -87,7 +87,7 @@ jobs:
           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       
           for service in $SERVICES; do
-            FILE="$FOLDER/${service}.yaml"
+            FILE="$FOLDER/${service}-${{ inputs.env_id }}.yaml"
             if [ -f "$FILE" ]; then
               echo "🔄 Updating $FILE..."
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
@@ -95,6 +95,7 @@ jobs:
               echo "⚠️ $FILE not found. Skipping..."
             fi
           done
+
  
       - name: Commit and push updated manifests
         run: |
