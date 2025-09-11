@@ -1,106 +1,10 @@
-
-# name: Build and Deploy
-
-# on:
-#   push:
-#     branches:
-#       - main
-
-# permissions:
-#   contents: write  # ✅ Allows pushing changes to the repo
-
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-
-#       - name: Set up Docker Buildx
-#         uses: docker/setup-buildx-action@v1
-
-#       - name: Log in to Docker Hub
-#         uses: docker/login-action@v1
-#         with:
-#           username: chandan.cloudops@gmail.com
-#           password: D7204181C@#123
-
-#       # - name: Build and push Docker images
-#       #   run: |
-#       #     DOCKER_HUB=cloudops96
-#       #     SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-#       #     for service in $SERVICES; do
-#       #       if [ "$service" = "cartservice" ]; then
-#       #         docker build -t $DOCKER_HUB/private:$service ./src/$service/src
-#       #       else
-#       #         docker build -t $DOCKER_HUB/private:$service ./src/$service
-#       #       fi
-#       #       docker push $DOCKER_HUB/private:$service
-#       #     done
-
-#   update_manifests:
-#     runs-on: ubuntu-latest
-#     needs: build  # ✅ Runs after the build job
-#     steps:
-#       - name: Checkout code
-#         uses: actions/checkout@v2
-#         with:
-#           persist-credentials: false  # ✅ Prevents GitHub Actions from using its own credentials
-#       - name: Fix Kubernetes manifests
-#         run: |
-#           DOCKER_HUB=cloudops96
-#           SERVICES="adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
-      
-#           for service in $SERVICES; do
-#             FILE="kubernetes-manifests/${service}.yaml"
-      
-#             if [ -f "$FILE" ]; then
-#               echo "🔄 Fixing $FILE..." 
-#               # Fix image references
-#               sed -i "s|image: .*|image: $DOCKER_HUB/public:$service|g" "$FILE"
-    
-#             else
-#               echo "⚠️ Warning: $FILE not found. Skipping..."
-#             fi
-#           done
-
-
-
-
-
-
-
-#       - name: Commit and push changes to GitHub
-#         env:
-#           PAT_TOKEN: ${{ secrets.MY_PAT }}  # ✅ Use Personal Access Token (PAT)
-#         run: |
-#           git config --global user.name "GitHub Actions"
-#           git config --global user.email "actions@github.com"
-#           git add kubernetes-manifests/
-#           git commit -m "Update Kubernetes manifests with new image tags [skip ci]" || echo "No changes to commit"
-#           git push https://x-access-token:${PAT_TOKEN}@github.com/chandan-cloudops/E-commerce-EKS-Terraform.git main
-
-#   # deploy:
-#   #   runs-on: ubuntu-latest
-#   #   needs: update_manifests  # ✅ Runs after the manifest update job
-#   #   steps:
-#   #     - name: Checkout code
-#   #       uses: actions/checkout@v2
-
-#   #     # - name: Deploy to Kubernetes
-#   #     #   run: |
-#   #     #     echo "${{ secrets.KUBE_CONFIG }}" > kubeconfig.yaml
-#   #     #     export KUBECONFIG=kubeconfig.yaml
-#   #     #     kubectl apply -f kubernetes-manifests/
-
-
 name: CI/CD GKE Cluster
 
 on:
   push:
     branches:
       - staging
-      # - main
+      - main
 
 jobs:
   staging:
@@ -111,9 +15,8 @@ jobs:
       environment: staging
       env_id: stg
       ref: ${{ github.sha }}
+      folder: staging_deployments_files   # 👈 passed here
     secrets:
-      # AWS_SECRET_TOKEN: ${{ secrets.STAGING_SECRET_TOKEN }}
-      # AWS_ACCESS_KEY: ${{ secrets.STAGING_ACCESS_KEY }}
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -127,10 +30,8 @@ jobs:
       environment: production
       env_id: prod
       ref: ${{ github.sha }}
+      folder: production_deployment_files   # 👈 passed here
     secrets:
-      # ACCESS_TOKEN: ${{ secrets.PROD_ACCESS_TOKEN }}
-      # GIT_USERNAME: ${{ secrets.PROD_GIT_USERNAME }}
-      # GIT_PASSWORD: ${{ secrets.PROD_GIT_PASSWORD }}
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
