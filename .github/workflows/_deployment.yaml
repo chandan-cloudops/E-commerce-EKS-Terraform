@@ -222,6 +222,8 @@ jobs:
             if [ -f "$FILE" ]; then
               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
             else
+               echo "⚠️ $FILE not found. Skipping..."
+
             fi
           done
  
