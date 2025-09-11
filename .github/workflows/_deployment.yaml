@@ -28,8 +28,8 @@ on:
         required: true
         description: Space-separated list of base YAML file names.
     secrets:
-      ACCESS_TOKEN:
-        required: true
+      # ACCESS_TOKEN:
+      #   required: true
       GIT_USERNAME:
         required: true
       GIT_PASSWORD:
