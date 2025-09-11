@@ -34,6 +34,10 @@ on:
         required: true
       GIT_PASSWORD:
         required: true
+      DOCKERHUB_USERNAME:   # 👈 add this
+        required: true
+      DOCKERHUB_TOKEN:      # 👈 add this
+        required: true        
 
 env:
   REGION: europe-west3
