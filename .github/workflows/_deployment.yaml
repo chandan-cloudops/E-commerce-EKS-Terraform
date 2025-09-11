@@ -130,7 +130,7 @@ jobs:
           if [ -n "$PR_NUMBER" ]; then
             gh pr edit "$PR_NUMBER" --title "$TITLE" --body "$BODY"
           else
-            gh pr create --repo Lianecare/cicd-argo-cd \
+            gh pr create --repo https://github.com/chandan-cloudops/Production_Grade_CICD_GitHub_Action.git \
               --head releasing --base main \
               --title "$TITLE" --body "$BODY"
           fi
