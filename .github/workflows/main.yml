@@ -15,7 +15,9 @@ jobs:
       environment: staging
       env_id: stg
       ref: ${{ github.sha }}
-      folder: staging_deployments_files   # 👈 passed here
+      folder: staging_deployments_files
+      branch: staging                     # ✅ added
+      base_files: "celery-worker celerybeat flower solaace"   # ✅ added
     secrets:
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
@@ -30,7 +32,9 @@ jobs:
       environment: production
       env_id: prod
       ref: ${{ github.sha }}
-      folder: production_deployment_files   # 👈 passed here
+      folder: production_deployment_files
+      branch: releasing                    # ✅ added
+      base_files: "celery-worker celerybeat flower solaace"  # ✅ added
     secrets:
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
