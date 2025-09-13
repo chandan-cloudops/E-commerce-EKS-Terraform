@@ -1,112 +1,101 @@
-name: Reusable deployment Workflow
+
+name: Reusable Deployment Workflow
 
 on:
   workflow_call:
     inputs:
       environment:
-        type: string
         required: true
-        description: Name of the target environment (e.g., production, staging).
+        type: string
       env_id:
-        type: string
         required: true
-        description: Short identifier for environment (e.g., prd, stg).
+        type: string
       ref:
-        type: string
         required: true
-        description: The tag or SHA to checkout.
-      folder:                    # ✅ FIXED
         type: string
+      folder:
         required: true
-        description: Deployment folder path.
-      branch:                    # ✅ FIXED
         type: string
+      branch:
         required: true
-        description: Branch to checkout for deployment repo.
-      base_files:                # ✅ FIXED
         type: string
+      base_files:
         required: true
-        description: Space-separated list of base YAML file names.
+        type: string
     secrets:
-      # ACCESS_TOKEN:
-      #   required: true
       GIT_USERNAME:
         required: true
       GIT_PASSWORD:
         required: true
-      DOCKERHUB_USERNAME:   # 👈 add this
+      DOCKERHUB_USERNAME:
         required: true
-      DOCKERHUB_TOKEN:      # 👈 add this
-        required: true        
+      DOCKERHUB_TOKEN:
+        required: true
 
 env:
-  REGION: europe-west3
-  PROJECT: lianecare-342010
-  ARTIFACT_REPO: solace
+  DOCKER_HUB: cloudops96
   PLATFORM: linux/amd64
 
 jobs:
-  lianecare_backend_workflow:
+  build:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
+    outputs:
+      build_tag: ${{ steps.build-and-push.outputs.build_tag }}
     steps:
-      - name: Checkout
+      - name: Checkout backend repo
         uses: actions/checkout@v3
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Google Auth
-        id: auth
-        uses: google-github-actions/auth@v1.3.0
+      - name: Log in to DockerHub
+        uses: docker/login-action@v2
         with:
-          token_format: access_token
-          credentials_json: '${{ secrets.ACCESS_TOKEN }}'
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Docker Auth
-        uses: docker/login-action@v2.2.0
-        with:
-          username: oauth2accesstoken
-          password: '${{ steps.auth.outputs.access_token }}'
-          registry: '${{ env.REGION }}-docker.pkg.dev'
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2.10.0
-        with:
-          driver-opts: network=host
-
-      - name: Build and Push Docker image to Artifact Registry
+      - name: Build and push Docker images
+        id: build-and-push
         run: |
           BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
-          docker buildx build --platform ${{ env.PLATFORM }} \
-            -f compose/production/django/Dockerfile \
-            -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT }}/${{ env.ARTIFACT_REPO }}/${{ env.ARTIFACT_REPO }}:${BUILD_TAG} \
-            --push .
+
+          for service in ${{ inputs.base_files }}; do
+            echo "🚀 Building and pushing $service:$BUILD_TAG..."
+            # For cartservice, the path is different
+            if [ "$service" = "cartservice" ]; then
+              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+            else
+              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+            fi
+            docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+          done
+
+          echo "build_tag=$BUILD_TAG" >> $GITHUB_OUTPUT
 
   modify_git:
-    needs: lianecare_backend_workflow
+    needs: build
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     steps:
       - name: Checkout deployment repo
         uses: actions/checkout@v3
         with:
-          repository: Lianecare/cicd-argo-cd
+          repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
           ref: ${{ inputs.branch }}
           token: ${{ secrets.GIT_PASSWORD }}
           fetch-depth: 0
 
-      - name: Update selected YAML manifests with new image tag
+      - name: Update Kubernetes manifests
         run: |
-          BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT }}/${{ env.ARTIFACT_REPO }}/${{ env.ARTIFACT_REPO }}:${BUILD_TAG}"
+          BUILD_TAG="${{ needs.build.outputs.build_tag }}"
 
-          for base in ${{ inputs.base_files }}; do
-            TARGET="${{ inputs.folder }}/${base}-${{ inputs.env_id }}.yml"
-            if [[ -f "$TARGET" ]]; then
-              sed -i "s|${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT }}/${{ env.ARTIFACT_REPO }}/${{ env.ARTIFACT_REPO }}:[^[:space:]]*|$IMAGE|g" "$TARGET"
-              git add "$TARGET"
+          for service in ${{ inputs.base_files }}; do
+            FILE="${{ inputs.folder }}/${service}-${{ inputs.env_id }}.yaml"
+            if [ -f "$FILE" ]; then
+              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
+              echo "✅ Updated $FILE"
             else
-              echo "$TARGET not found, skipping..."
+              echo "⚠️ $FILE not found. Skipping..."
             fi
           done
 
@@ -114,16 +103,16 @@ jobs:
         run: |
           git config --local user.name "${{ github.actor }}"
           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
-          git add "${{ inputs.folder }}/"
-          git commit -m "Update manifests in ${{ inputs.folder }} with new image (build #${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
+          git add ${{ inputs.folder }}/
+          git commit -m "Update manifests with new images (${{ inputs.env_id }}-${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
           git push origin HEAD
 
       - name: Create PR (production only)
         if: ${{ inputs.environment == 'production' }}
         run: |
-          IMAGE="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT }}/${{ env.ARTIFACT_REPO }}/${{ env.ARTIFACT_REPO }}:${{ inputs.env_id }}-${{ github.run_number }}"
+          IMAGE="${{ needs.lianecare_backend_workflow.outputs.image_tag }}"
           gh pr create \
-            --repo Lianecare/cicd-argo-cd \
+            --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
             --head ${{ inputs.branch }} \
             --base main \
             --title "Sync manifests to production (build #${{ github.run_number }})" \
