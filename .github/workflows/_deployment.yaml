@@ -162,6 +162,9 @@ on:
       base_files:
         required: true
         type: string
+      services:                 
+        required: true
+        type: string   
     secrets:
       GIT_USERNAME:
         required: true
