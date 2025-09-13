@@ -186,8 +186,8 @@ name: CI-CD-GKE-Cluster
 on:
   push:
     branches:
-      # - staging
-      # - main
+      - staging
+      - main
 
 jobs:
   staging:
@@ -198,7 +198,7 @@ jobs:
       environment: staging
       env_id: stage
       ref: ${{ github.sha }}
-      folder: staging_deployment_files
+      folder: staging_deployments_files
       branch: staging
       base_files: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
       services: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
