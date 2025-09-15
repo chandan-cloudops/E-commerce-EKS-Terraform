@@ -1,3 +1,52 @@
+# name: CI-CD-GKE-Cluster
+
+# on:
+#   push:
+#     branches:
+#       - staging
+#       - main
+
+# jobs:
+#   staging:
+#     name: Deploy to Staging GKE
+#     if: github.ref == 'refs/heads/staging'
+#     uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@staging
+#     with:
+#       environment: staging
+#       env_id: stage
+#       ref: ${{ github.sha }}
+#       folder: staging_deployments_files
+#       branch: staging
+#       base_files: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#       services: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#     secrets:
+#       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+#       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+#       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#   production:
+#     name: Deploy to Production GKE
+#     if: github.ref == 'refs/heads/main'
+#     uses: chandan-cloudops/E-commerce-EKS-Terraform/.github/workflows/_deployment.yaml@main
+#     with:
+#       environment: production
+#       env_id: prod
+#       ref: ${{ github.sha }}
+#       folder: production_deployment_files
+#       branch: releasing
+#       base_files: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#       services: "adservice emailservice productcatalogservice cartservice frontend recommendationservice checkoutservice loadgenerator shippingservice currencyservice paymentservice shoppingassistantservice"
+#     secrets:
+#       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
+#       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
+#       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+#       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+
+
+
+################# For ECR Main.yaml ###################################
+
 name: CI-CD-GKE-Cluster
 
 on:
@@ -22,8 +71,11 @@ jobs:
     secrets:
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REPO: ${{ secrets.ECR_REPO }}
 
   production:
     name: Deploy to Production GKE
@@ -40,5 +92,8 @@ jobs:
     secrets:
       GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
       GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
-      DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-      DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      ECR_REPO: ${{ secrets.ECR_REPO }}
