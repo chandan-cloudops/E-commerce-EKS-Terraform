@@ -122,7 +122,6 @@
 #         env:
 #           GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}
 
-
 ############ To Push On ECR #######################################
 
 
@@ -201,7 +200,7 @@ jobs:
           BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
 
           for service in ${{ inputs.base_files }}; do
-            IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}/${service}:${BUILD_TAG}"
+            IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}:$service-$BUILD_TAG"
             echo "🚀 Building and pushing $service:$BUILD_TAG..."
             if [ "$service" = "cartservice" ]; then
               docker build -t $IMAGE_URI ./src/$service/src
@@ -229,17 +228,19 @@ jobs:
       - name: Update Kubernetes manifests
         run: |
           BUILD_TAG="${{ needs.build.outputs.build_tag }}"
-
+  
           for service in ${{ inputs.base_files }}; do
             FILE="${{ inputs.folder }}/${service}-${{ inputs.env_id }}.yaml"
+            IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}:$service-$BUILD_TAG"
+  
             if [ -f "$FILE" ]; then
-              IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}/${service}:${BUILD_TAG}"
               sed -i "s|image: .*|image: $IMAGE_URI|g" "$FILE"
               echo " Updated $FILE"
             else
-              echo " $FILE not found. Skipping..."
+              echo "$FILE not found. Skipping..."
             fi
           done
+
 
       - name: Commit and push updated manifests
         run: |
