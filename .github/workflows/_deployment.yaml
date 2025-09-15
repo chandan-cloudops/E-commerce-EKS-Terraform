@@ -1,4 +1,134 @@
 
+# name: Reusable Deployment Workflow
+
+# on:
+#   workflow_call:
+#     inputs:
+#       environment:
+#         required: true
+#         type: string
+#       env_id:
+#         required: true
+#         type: string
+#       ref:
+#         required: true
+#         type: string
+#       folder:
+#         required: true
+#         type: string
+#       services:                  
+#         required: true
+#         type: string  
+#       branch:
+#         required: true
+#         type: string
+#       base_files:
+#         required: true
+#         type: string
+#     secrets:
+#       GIT_USERNAME:
+#         required: true
+#       GIT_PASSWORD:
+#         required: true
+#       DOCKERHUB_USERNAME:
+#         required: true
+#       DOCKERHUB_TOKEN:
+#         required: true
+
+# env:
+#   DOCKER_HUB: cloudops96
+#   PLATFORM: linux/amd64
+
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     environment: ${{ inputs.environment }}
+#     outputs:
+#       build_tag: ${{ steps.build-and-push.outputs.build_tag }}
+#     steps:
+#       - name: Checkout backend repo
+#         uses: actions/checkout@v3
+#         with:
+#           ref: ${{ inputs.ref }}
+
+#       - name: Log in to DockerHub
+#         uses: docker/login-action@v2
+#         with:
+#           username: ${{ secrets.DOCKERHUB_USERNAME }}
+#           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+#       - name: Build and push Docker images
+#         id: build-and-push
+#         run: |
+#           BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
+
+#           for service in ${{ inputs.base_files }}; do
+#             echo "🚀 Building and pushing $service:$BUILD_TAG..."
+#             # For cartservice, the path is different
+#             if [ "$service" = "cartservice" ]; then
+#               docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+#             else
+#               docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+#             fi
+#             docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+#           done
+
+#           echo "build_tag=$BUILD_TAG" >> $GITHUB_OUTPUT
+
+#   modify_git:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     environment: ${{ inputs.environment }}
+#     steps:
+#       - name: Checkout deployment repo
+#         uses: actions/checkout@v3
+#         with:
+#           repository: chandan-cloudops/Production_Grade_CICD_GitHub_Action
+#           ref: ${{ inputs.branch }}
+#           token: ${{ secrets.GIT_PASSWORD }}
+#           fetch-depth: 0
+
+#       - name: Update Kubernetes manifests
+#         run: |
+#           BUILD_TAG="${{ needs.build.outputs.build_tag }}"
+
+#           for service in ${{ inputs.base_files }}; do
+#             FILE="${{ inputs.folder }}/${service}-${{ inputs.env_id }}.yaml"
+#             if [ -f "$FILE" ]; then
+#               sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
+#               echo "✅ Updated $FILE"
+#             else
+#               echo "⚠️ $FILE not found. Skipping..."
+#             fi
+#           done
+
+#       - name: Commit and push updated manifests
+#         run: |
+#           git config --local user.name "${{ github.actor }}"
+#           git config --local user.email "${{ github.actor }}@users.noreply.github.com"
+#           git add ${{ inputs.folder }}/
+#           git commit -m "Update manifests with new images (${{ inputs.env_id }}-${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
+#           git push origin HEAD
+
+#       - name: Create PR (production only)
+#         if: ${{ inputs.environment == 'production' }}
+#         run: |
+#           IMAGE="${{ needs.lianecare_backend_workflow.outputs.image_tag }}"
+#           gh pr create \
+#             --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
+#             --head ${{ inputs.branch }} \
+#             --base main \
+#             --title "Sync manifests to production (build #${{ github.run_number }})" \
+#             --body "This PR updates deployment manifests with the latest Artifact Registry image: $IMAGE"
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}
+
+
+
+
+############ To Push On ECR #######################################
+
+
 name: Reusable Deployment Workflow
 
 on:
@@ -16,27 +146,32 @@ on:
       folder:
         required: true
         type: string
-      services:                  
-        required: true
-        type: string  
       branch:
         required: true
         type: string
       base_files:
         required: true
         type: string
+      services:                 
+        required: true
+        type: string   
     secrets:
       GIT_USERNAME:
         required: true
       GIT_PASSWORD:
         required: true
-      DOCKERHUB_USERNAME:
+      AWS_ACCESS_KEY:
         required: true
-      DOCKERHUB_TOKEN:
+      AWS_SECRET_KEY:
+        required: true
+      AWS_ACCOUNT_ID:
+        required: true
+      AWS_REGION:
+        required: true
+      ECR_REPO:
         required: true
 
 env:
-  DOCKER_HUB: cloudops96
   PLATFORM: linux/amd64
 
 jobs:
@@ -51,11 +186,17 @@ jobs:
         with:
           ref: ${{ inputs.ref }}
 
-      - name: Log in to DockerHub
-        uses: docker/login-action@v2
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
         with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | \
+          docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
 
       - name: Build and push Docker images
         id: build-and-push
@@ -63,14 +204,14 @@ jobs:
           BUILD_TAG="${{ inputs.env_id }}-${{ github.run_number }}"
 
           for service in ${{ inputs.base_files }}; do
+            IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}/${service}:${BUILD_TAG}"
             echo "🚀 Building and pushing $service:$BUILD_TAG..."
-            # For cartservice, the path is different
             if [ "$service" = "cartservice" ]; then
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service/src
+              docker build -t $IMAGE_URI ./src/$service/src
             else
-              docker build -t $DOCKER_HUB/private:$service-$BUILD_TAG ./src/$service
+              docker build -t $IMAGE_URI ./src/$service
             fi
-            docker push $DOCKER_HUB/private:$service-$BUILD_TAG
+            docker push $IMAGE_URI
           done
 
           echo "build_tag=$BUILD_TAG" >> $GITHUB_OUTPUT
@@ -95,10 +236,11 @@ jobs:
           for service in ${{ inputs.base_files }}; do
             FILE="${{ inputs.folder }}/${service}-${{ inputs.env_id }}.yaml"
             if [ -f "$FILE" ]; then
-              sed -i "s|image: .*|image: $DOCKER_HUB/private:$service-$BUILD_TAG|g" "$FILE"
-              echo "✅ Updated $FILE"
+              IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}/${service}:${BUILD_TAG}"
+              sed -i "s|image: .*|image: $IMAGE_URI|g" "$FILE"
+              echo " Updated $FILE"
             else
-              echo "⚠️ $FILE not found. Skipping..."
+              echo " $FILE not found. Skipping..."
             fi
           done
 
@@ -109,16 +251,3 @@ jobs:
           git add ${{ inputs.folder }}/
           git commit -m "Update manifests with new images (${{ inputs.env_id }}-${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
           git push origin HEAD
-
-      - name: Create PR (production only)
-        if: ${{ inputs.environment == 'production' }}
-        run: |
-          IMAGE="${{ needs.lianecare_backend_workflow.outputs.image_tag }}"
-          gh pr create \
-            --repo chandan-cloudops/Production_Grade_CICD_GitHub_Action \
-            --head ${{ inputs.branch }} \
-            --base main \
-            --title "Sync manifests to production (build #${{ github.run_number }})" \
-            --body "This PR updates deployment manifests with the latest Artifact Registry image: $IMAGE"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GIT_PASSWORD }}
