@@ -234,7 +234,7 @@ jobs:
           BUILD_TAG="${{ needs.build.outputs.build_tag }}"
   
           for service in ${{ inputs.base_files }}; do
-            FILE="${{ inputs.folder }}/${service}-${{ inputs.env_id }}.yaml"
+            FILE="${{ inputs.folder }}/${service}-test.yaml"
             IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.ECR_REPO }}:$service-$BUILD_TAG"
   
             if [ -f "$FILE" ]; then
