@@ -253,3 +253,4 @@ jobs:
           git add ${{ inputs.folder }}/
           git commit -m "Update manifests with new images (${{ inputs.env_id }}-${{ github.run_number }}) [skip ci]" || echo "No changes to commit"
           git push origin HEAD
+          
